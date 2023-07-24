@@ -1,4 +1,4 @@
-package com.fastcampus.sns.repositor;
+package com.fastcampus.sns.repository;
 
 import java.util.Optional;
 

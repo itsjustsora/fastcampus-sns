@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
@@ -19,14 +20,16 @@ import org.hibernate.annotations.Where;
 import com.fastcampus.sns.model.UserRole;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "\"user\"")
+@Entity(name = "user_entity")
 @Table
-@SQLDelete(sql = "UPDATE \"user\" SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE user_entity SET deleted_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at is NULL")
+@NoArgsConstructor
 public class UserEntity {
 
 	@Id
@@ -51,7 +54,7 @@ public class UserEntity {
 		this.registeredAt = Timestamp.from(Instant.now());
 	}
 
-	@PrePersist
+	@PreUpdate
 	void updatedAt() {
 		this.registeredAt = Timestamp.from(Instant.now());
 	}

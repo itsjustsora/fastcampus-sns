@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc // for API Test
-public class UserControllerTest {
+class UserControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -55,9 +55,9 @@ public class UserControllerTest {
 		String username = "username";
 		String password = "password";
 
-		when(userService.join(username, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
+		when(userService.join(username, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME));
 
-		mockMvc.perform(post("/api/v1/users/login")
+		mockMvc.perform(post("/api/v1/users/join")
 			.contentType(MediaType.APPLICATION_JSON)
 			// TODO : add request body
 			.content(objectMapper.writeValueAsBytes(new UserJoinRequest(username, password)))
@@ -72,7 +72,7 @@ public class UserControllerTest {
 
 		when(userService.login(username, password)).thenReturn("test_token");
 
-		mockMvc.perform(post("/api/v1/users/join")
+		mockMvc.perform(post("/api/v1/users/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				// TODO : add request body
 				.content(objectMapper.writeValueAsBytes(new UserLoginRequest(username, password)))
@@ -85,7 +85,7 @@ public class UserControllerTest {
 		String username = "username";
 		String password = "password";
 
-		when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
+		when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.USER_NOT_FOUND));
 
 		mockMvc.perform(post("/api/v1/users/login")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ public class UserControllerTest {
 		String username = "username";
 		String password = "password";
 
-		when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
+		when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.INVALID_PASSWORD));
 
 		mockMvc.perform(post("/api/v1/users/login")
 				.contentType(MediaType.APPLICATION_JSON)
