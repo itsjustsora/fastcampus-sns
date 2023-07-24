@@ -1,6 +1,12 @@
 package com.fastcampus.sns.model;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fastcampus.sns.model.entity.UserEntity;
 
@@ -9,11 +15,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 	private Integer id;
 	private String username;
 	private String password;
-	private UserRole userRole;
+	private UserRole role;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
@@ -28,5 +34,30 @@ public class User {
 			entity.getUpdatedAt(),
 			entity.getDeletedAt()
 		);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(role.toString()));
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return deletedAt == null;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return deletedAt == null;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return deletedAt == null;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return deletedAt == null;
 	}
 }

@@ -8,6 +8,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+
+	INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token"),
 	DUPLICATED_USER_NAME(HttpStatus.CONFLICT, "Username is duplicated."),
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
