@@ -12,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.fastcampus.sns.exception.ErrorCode;
 import com.fastcampus.sns.exception.SnsApplicationException;
+import com.fastcampus.sns.fixture.PostEntityFixture;
+import com.fastcampus.sns.fixture.UserEntityFixture;
 import com.fastcampus.sns.model.entity.PostEntity;
 import com.fastcampus.sns.model.entity.UserEntity;
 import com.fastcampus.sns.repository.PostEntityRepository;
@@ -51,5 +53,58 @@ class PostServiceTest {
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.create(title, body, username));
 		Assertions.assertEquals(ErrorCode.USER_NOT_FOUND, e.getErrorCode());
+	}
+
+	@Test
+	void 포스트수정이_성공한경우() {
+		String title = "title";
+		String body = "body";
+		String username = "username";
+		Integer postId = 1;
+
+		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
+		UserEntity userEntity = postEntity.getUser();
+
+		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+		when(postEntityRepository.saveAndFlush(any())).thenReturn(postEntity);
+
+		Assertions.assertDoesNotThrow(() -> postService.modify(title, body, username, postId));
+	}
+
+	@Test
+	void 포스트수정시_포스트가_존재하지_않는_경우() {
+		String title = "title";
+		String body = "body";
+		String username = "username";
+		Integer postId = 1;
+
+		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
+		UserEntity userEntity = postEntity.getUser();
+
+		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
+			() -> postService.modify(title, body, username, postId));
+		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+	}
+
+	@Test
+	void 포스트수정시_권한이_없는_경우() {
+		String title = "title";
+		String body = "body";
+		String username = "username";
+		Integer postId = 1;
+
+		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
+		UserEntity writer = UserEntityFixture.get("username1", "password", 2);
+
+		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(writer));
+		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
+			() -> postService.modify(title, body, username, postId));
+		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 }

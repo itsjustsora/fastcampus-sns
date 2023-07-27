@@ -56,7 +56,7 @@ public class UserEntity {
 
 	@PreUpdate
 	void updatedAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
+		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
 	public static UserEntity of(String username, String password) {
