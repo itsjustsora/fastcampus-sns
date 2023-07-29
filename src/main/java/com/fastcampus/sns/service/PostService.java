@@ -1,6 +1,8 @@
 package com.fastcampus.sns.service;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,13 @@ public class PostService {
 	private final PostEntityRepository postEntityRepository;
 	private final UserEntityRepository userEntityRepository;
 
+	public Page<Post> list(Pageable pageable) {
+		return postEntityRepository.findAll(pageable).map(Post::fromEntity);
+	}
+
+	public Page<Post> my(Integer userId, Pageable pageable) {
+		return postEntityRepository.findAllByUserId(userId, pageable).map(Post::fromEntity);
+	}
 
 	@Transactional
 	public void create(String title, String body, String username) {

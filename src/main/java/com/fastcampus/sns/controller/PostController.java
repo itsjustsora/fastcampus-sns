@@ -1,7 +1,10 @@
 package com.fastcampus.sns.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,7 +17,9 @@ import com.fastcampus.sns.controller.request.PostModifyRequest;
 import com.fastcampus.sns.controller.response.PostResponse;
 import com.fastcampus.sns.controller.response.Response;
 import com.fastcampus.sns.model.Post;
+import com.fastcampus.sns.model.User;
 import com.fastcampus.sns.service.PostService;
+import com.fastcampus.sns.util.ClassUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,4 +47,16 @@ public class PostController {
 		postService.delete(authentication.getName(), postId);
 		return Response.success();
 	}
+
+	@GetMapping
+	public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication) {
+		return Response.success(postService.list(pageable).map(PostResponse::fromPost));
+	}
+
+	@GetMapping("/my")
+	public Response<Page<PostResponse>> myPosts(Pageable pageable, Authentication authentication) {
+		User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+		return Response.success(postService.my(user.getId(), pageable).map(PostResponse::fromPost));
+	}
+
 }

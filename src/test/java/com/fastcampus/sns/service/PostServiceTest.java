@@ -9,10 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.fastcampus.sns.exception.ErrorCode;
 import com.fastcampus.sns.exception.SnsApplicationException;
 import com.fastcampus.sns.fixture.PostEntityFixture;
+import com.fastcampus.sns.fixture.TestInfoFixture;
 import com.fastcampus.sns.fixture.UserEntityFixture;
 import com.fastcampus.sns.model.entity.PostEntity;
 import com.fastcampus.sns.model.entity.UserEntity;
@@ -152,5 +155,30 @@ class PostServiceTest {
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
 			() -> postService.delete(username, postId));
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
+	}
+
+	@Test
+	void 포스트목록요청이_성공한경우() {
+		Pageable pageable = mock(Pageable.class);
+		when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
+		Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+	}
+
+	@Test
+	void 내포스트목록요청이_성공한경우() {
+		TestInfoFixture.TestInfo fixture = TestInfoFixture.get();
+		Pageable pageable = mock(Pageable.class);
+		when(postEntityRepository.findAllByUserId(any(), pageable)).thenReturn(Page.empty());
+		Assertions.assertDoesNotThrow(() -> postService.my(fixture.getUserId(), pageable));
+	}
+
+	@Test
+	void 내포스트목록을_가져올_유저가_존재하지_않는경우() {
+		TestInfoFixture.TestInfo fixture = TestInfoFixture.get();
+		when(userEntityRepository.findByUsername(fixture.getUsername())).thenReturn(Optional.empty());
+		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () ->
+			postService.my(fixture.getUserId(), mock(Pageable.class)));
+
+		Assertions.assertEquals(ErrorCode.USER_NOT_FOUND, e.getErrorCode());
 	}
 }
