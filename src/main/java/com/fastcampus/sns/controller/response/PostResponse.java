@@ -2,9 +2,7 @@ package com.fastcampus.sns.controller.response;
 
 import java.sql.Timestamp;
 
-import com.fastcampus.sns.controller.request.PostModifyRequest;
 import com.fastcampus.sns.model.Post;
-import com.fastcampus.sns.model.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -199,18 +199,18 @@ class PostControllerTest {
 	void 내피드목록() throws Exception {
 		when(postService.my(any(), any())).thenReturn(Page.empty());
 
-		mockMvc.perform(get("/api/v1/posts")
+		mockMvc.perform(get("/api/v1/posts/my")
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
 			.andExpect(status().isOk());
 	}
 
 	@Test
-	@WithMockUser
+	@WithAnonymousUser
 	void 내피드목록요청시_로그인하지_않은경우() throws Exception {
 		when(postService.my(any(), any())).thenReturn(Page.empty());
 
-		mockMvc.perform(get("/api/v1/posts")
+		mockMvc.perform(get("/api/v1/posts/my")
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
 			.andExpect(status().isUnauthorized());

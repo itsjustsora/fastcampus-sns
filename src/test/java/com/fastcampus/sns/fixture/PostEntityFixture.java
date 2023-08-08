@@ -7,7 +7,7 @@ public class PostEntityFixture {
 	public static PostEntity get(String username, Integer postId, Integer userId) {
 		UserEntity user = new UserEntity();
 		user.setId(userId);
-		user.setUsername(username);
+		user.setUserName(username);
 
 		PostEntity result = new PostEntity();
 		result.setUser(user);

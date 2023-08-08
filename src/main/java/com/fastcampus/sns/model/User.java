@@ -27,7 +27,7 @@ public class User implements UserDetails {
 	public static User fromEntity(UserEntity entity) {
 		return new User(
 			entity.getId(),
-			entity.getUsername(),
+			entity.getUserName(),
 			entity.getPassword(),
 			entity.getRole(),
 			entity.getRegisteredAt(),

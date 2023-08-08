@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import com.fastcampus.sns.exception.ErrorCode;
 import com.fastcampus.sns.exception.SnsApplicationException;
 import com.fastcampus.sns.fixture.PostEntityFixture;
-import com.fastcampus.sns.fixture.TestInfoFixture;
 import com.fastcampus.sns.fixture.UserEntityFixture;
 import com.fastcampus.sns.model.entity.PostEntity;
 import com.fastcampus.sns.model.entity.UserEntity;
@@ -40,7 +39,7 @@ class PostServiceTest {
 		String body = "body";
 		String username = "username";
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(mock(UserEntity.class)));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(mock(UserEntity.class)));
 		when(postEntityRepository.save(any())).thenReturn(mock(PostEntity.class));
 
 		Assertions.assertDoesNotThrow(() -> postService.create(title, body, username));
@@ -52,7 +51,7 @@ class PostServiceTest {
 		String body = "body";
 		String username = "username";
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.empty());
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.empty());
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.create(title, body, username));
 		Assertions.assertEquals(ErrorCode.USER_NOT_FOUND, e.getErrorCode());
@@ -68,7 +67,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity userEntity = postEntity.getUser();
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(userEntity));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 		when(postEntityRepository.saveAndFlush(any())).thenReturn(postEntity);
 
@@ -85,7 +84,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity userEntity = postEntity.getUser();
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(userEntity));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
@@ -103,7 +102,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity writer = UserEntityFixture.get("username1", "password", 2);
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(writer));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(writer));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
@@ -119,7 +118,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity userEntity = postEntity.getUser();
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(userEntity));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
 		Assertions.assertDoesNotThrow(() -> postService.delete(username, postId));
@@ -133,7 +132,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity userEntity = postEntity.getUser();
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(userEntity));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
@@ -149,7 +148,7 @@ class PostServiceTest {
 		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
 		UserEntity writer = UserEntityFixture.get("username1", "password", 2);
 
-		when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(writer));
+		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(writer));
 		when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
 		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
@@ -158,27 +157,18 @@ class PostServiceTest {
 	}
 
 	@Test
-	void 포스트목록요청이_성공한경우() {
+	void 피드목록요청이_성공한경우() {
 		Pageable pageable = mock(Pageable.class);
 		when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
 		Assertions.assertDoesNotThrow(() -> postService.list(pageable));
 	}
 
 	@Test
-	void 내포스트목록요청이_성공한경우() {
-		TestInfoFixture.TestInfo fixture = TestInfoFixture.get();
+	void 내피드목록요청이_성공한경우() {
 		Pageable pageable = mock(Pageable.class);
-		when(postEntityRepository.findAllByUserId(any(), pageable)).thenReturn(Page.empty());
-		Assertions.assertDoesNotThrow(() -> postService.my(fixture.getUserId(), pageable));
-	}
-
-	@Test
-	void 내포스트목록을_가져올_유저가_존재하지_않는경우() {
-		TestInfoFixture.TestInfo fixture = TestInfoFixture.get();
-		when(userEntityRepository.findByUsername(fixture.getUsername())).thenReturn(Optional.empty());
-		SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () ->
-			postService.my(fixture.getUserId(), mock(Pageable.class)));
-
-		Assertions.assertEquals(ErrorCode.USER_NOT_FOUND, e.getErrorCode());
+		UserEntity user = mock(UserEntity.class);
+		when(userEntityRepository.findByUserName(any())).thenReturn(Optional.of(user));
+		when(postEntityRepository.findAllByUser(user, pageable)).thenReturn(Page.empty());
+		Assertions.assertDoesNotThrow(() -> postService.my("", pageable));
 	}
 }

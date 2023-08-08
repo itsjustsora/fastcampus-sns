@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.fastcampus.sns.model.entity.PostEntity;
+import com.fastcampus.sns.model.entity.UserEntity;
 
 @Repository
 public interface PostEntityRepository extends JpaRepository<PostEntity, Integer> {
-	public Page<PostEntity> findAllByUserId(Integer userId, Pageable pageable);
+	Page<PostEntity> findAllByUser(UserEntity entity, Pageable pageable);
 }

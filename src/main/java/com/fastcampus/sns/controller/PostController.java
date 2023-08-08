@@ -17,9 +17,7 @@ import com.fastcampus.sns.controller.request.PostModifyRequest;
 import com.fastcampus.sns.controller.response.PostResponse;
 import com.fastcampus.sns.controller.response.Response;
 import com.fastcampus.sns.model.Post;
-import com.fastcampus.sns.model.User;
 import com.fastcampus.sns.service.PostService;
-import com.fastcampus.sns.util.ClassUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,9 +52,8 @@ public class PostController {
 	}
 
 	@GetMapping("/my")
-	public Response<Page<PostResponse>> myPosts(Pageable pageable, Authentication authentication) {
-		User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-		return Response.success(postService.my(user.getId(), pageable).map(PostResponse::fromPost));
+	public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
+		return Response.success(postService.my(authentication.getName(), pageable).map(PostResponse::fromPost));
 	}
 
 }

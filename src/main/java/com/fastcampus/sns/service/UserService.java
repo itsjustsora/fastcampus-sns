@@ -28,7 +28,7 @@ public class UserService {
 	private Long expiredTimeMs;
 
 	public User loadUserByUsername(String username) {
-		return userEntityRepository.findByUsername(username).map(User::fromEntity).orElseThrow(
+		return userEntityRepository.findByUserName(username).map(User::fromEntity).orElseThrow(
 			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username))
 		);
 	}
@@ -36,7 +36,7 @@ public class UserService {
 	@Transactional
 	public User join(String username, String password) {
 		// 회원가입하려는 username으로 회원가입된 유저가 있는지
-		userEntityRepository.findByUsername(username).ifPresent(it -> {
+		userEntityRepository.findByUserName(username).ifPresent(it -> {
 			throw new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated.", username));
 		});
 
@@ -49,7 +49,7 @@ public class UserService {
 	// TODO : implement
 	public String login(String username, String password) {
 		// 회원가입 여부 체크
-		UserEntity userEntity = userEntityRepository.findByUsername(username).orElseThrow(
+		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
 			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username)));
 
 		// 비밀번호 체크

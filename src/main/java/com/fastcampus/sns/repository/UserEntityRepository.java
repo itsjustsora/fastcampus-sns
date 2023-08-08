@@ -9,5 +9,5 @@ import com.fastcampus.sns.model.entity.UserEntity;
 
 @Repository
 public interface UserEntityRepository extends JpaRepository<UserEntity, Integer> {
-	Optional<UserEntity> findByUsername(String username);
+	Optional<UserEntity> findByUserName(String username);
 }

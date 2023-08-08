@@ -10,7 +10,7 @@ import lombok.Getter;
 public class UserJoinRequest {
 
 	@JsonProperty
-	private String username;
+	private String name;
 
 	@JsonProperty
 	private String password;

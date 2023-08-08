@@ -27,13 +27,16 @@ public class PostService {
 		return postEntityRepository.findAll(pageable).map(Post::fromEntity);
 	}
 
-	public Page<Post> my(Integer userId, Pageable pageable) {
-		return postEntityRepository.findAllByUserId(userId, pageable).map(Post::fromEntity);
+	public Page<Post> my(String username, Pageable pageable) {
+		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
+			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username))
+ 		);
+		return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
 	}
 
 	@Transactional
 	public void create(String title, String body, String username) {
-		UserEntity userEntity = userEntityRepository.findByUsername(username).orElseThrow(
+		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
 			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username)));
 
 		postEntityRepository.save(PostEntity.of(title, body, userEntity));
@@ -41,7 +44,7 @@ public class PostService {
 
 	@Transactional
 	public Post modify(String title, String body, String username, Integer postId) {
-		UserEntity userEntity = userEntityRepository.findByUsername(username).orElseThrow(
+		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
 			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username)));
 
 		PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(
@@ -62,7 +65,7 @@ public class PostService {
 
 	@Transactional
 	public void delete(String username, Integer postId) {
-		UserEntity userEntity = userEntityRepository.findByUsername(username).orElseThrow(
+		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
 			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username)));
 
 		PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(
