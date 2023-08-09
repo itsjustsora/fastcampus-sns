@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fastcampus.sns.controller.request.PostCommentRequest;
 import com.fastcampus.sns.controller.request.PostCreateRequest;
 import com.fastcampus.sns.controller.request.PostModifyRequest;
+import com.fastcampus.sns.controller.response.CommentResponse;
 import com.fastcampus.sns.controller.response.PostResponse;
 import com.fastcampus.sns.controller.response.Response;
 import com.fastcampus.sns.model.Post;
@@ -67,4 +69,14 @@ public class PostController {
 		return Response.success(postService.likeCount(postId));
 	}
 
+	@PostMapping("/{postId}/comments")
+	public Response<Void> comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+		postService.comment(postId, authentication.getName(), request.getComment());
+		return Response.success();
+	}
+
+	@GetMapping("/{postId}/comments")
+	public Response<Page<CommentResponse>> comment(@PathVariable Integer postId, Pageable pageable, Authentication authentication) {
+		return Response.success(postService.getComment(postId, pageable).map(CommentResponse::fromComment));
+	}
 }
