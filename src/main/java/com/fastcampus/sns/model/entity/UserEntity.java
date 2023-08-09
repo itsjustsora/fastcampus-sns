@@ -3,6 +3,7 @@ package com.fastcampus.sns.model.entity;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -35,6 +36,7 @@ public class UserEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	@Column(name = "user_name", unique = true)
 	private String userName;
 
 	private String password;

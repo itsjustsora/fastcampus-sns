@@ -3,7 +3,10 @@ package com.fastcampus.sns.model.entity;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +18,13 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
+
+import com.fastcampus.sns.model.AlarmArgs;
+import com.fastcampus.sns.model.AlarmType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,27 +33,30 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"comment\"", indexes = {
-	@Index(name = "post_id_idx", columnList = "post_id")
+@Table(name = "\"alarm\"", indexes = {
+	@Index(name = "alarm_user_id_idx", columnList = "user_id")
 })
-@SQLDelete(sql = "UPDATE \"comment\" SET deleted_at = NOW() WHERE id=?")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@SQLDelete(sql = "UPDATE \"alarm\" SET deleted_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at is NULL")
 @NoArgsConstructor
-public class CommentEntity {
+public class AlarmEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	// 알람 받은 사람
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private UserEntity user;
 
-	@ManyToOne
-	@JoinColumn(name = "post_id")
-	private PostEntity post;
+	@Enumerated(EnumType.STRING)
+	private AlarmType alarmType;
 
-	private String comment;
+	@Type(type = "jsonb")
+	@Column(columnDefinition = "json")
+	private AlarmArgs args;
 
 	private Timestamp registeredAt;
 
@@ -62,11 +74,11 @@ public class CommentEntity {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
-	public static CommentEntity of(UserEntity userEntity, PostEntity postEntity, String comment) {
-		CommentEntity entity = new CommentEntity();
+	public static AlarmEntity of(UserEntity userEntity, AlarmType alarmType, AlarmArgs args) {
+		AlarmEntity entity = new AlarmEntity();
 		entity.setUser(userEntity);
-		entity.setPost(postEntity);
-		entity.setComment(comment);
+		entity.setAlarmType(alarmType);
+		entity.setArgs(args);
 		return entity;
 	}
 }
