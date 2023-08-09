@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
@@ -22,9 +23,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "like_entity")
-@Table
-@SQLDelete(sql = "UPDATE like_entity SET deleted_at = NOW() WHERE id=?")
+@Entity
+@Table(name = "\"like\"", indexes = {
+	@Index(name = "like_post_id_idx", columnList = "post_id"),
+	@Index(name = "like_user_id_idx", columnList = "user_id")
+})
+@SQLDelete(sql = "UPDATE \"like\" SET deleted_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at is NULL")
 @NoArgsConstructor
 public class LikeEntity {

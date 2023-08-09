@@ -24,9 +24,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "user_entity")
-@Table
-@SQLDelete(sql = "UPDATE user_entity SET deleted_at = NOW() WHERE id=?")
+@Entity
+@Table(name = "\"user\"")
+@SQLDelete(sql = "UPDATE \"user\" SET removed_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at is NULL")
 @NoArgsConstructor
 public class UserEntity {

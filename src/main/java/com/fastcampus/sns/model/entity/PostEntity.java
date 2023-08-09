@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
@@ -23,9 +24,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "post_entity")
-@Table
-@SQLDelete(sql = "UPDATE post_entity SET deleted_at = NOW() WHERE id=?")
+@Entity
+@Table(name = "\"post\"", indexes = {
+	@Index(name = "post_user_id_idx", columnList = "user_id")
+})
+@SQLDelete(sql = "UPDATE \"post\" SET removed_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at is NULL")
 @NoArgsConstructor
 public class PostEntity {
