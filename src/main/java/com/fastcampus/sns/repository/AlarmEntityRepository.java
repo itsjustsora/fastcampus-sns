@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.fastcampus.sns.model.entity.AlarmEntity;
-import com.fastcampus.sns.model.entity.UserEntity;
 
 @Repository
 public interface AlarmEntityRepository extends JpaRepository<AlarmEntity, Integer> {
-	Page<AlarmEntity> findAllByUser(UserEntity user, Pageable pageable);
+	Page<AlarmEntity> findAllByUserId(Integer userId, Pageable pageable);
 }

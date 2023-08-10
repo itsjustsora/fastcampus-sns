@@ -79,6 +79,8 @@ public class PostService {
 				String.format("%s has no permission with %s", username, postId));
 		}
 
+		commentEntityRepository.deleteAllByPost(postEntity);
+		likeEntityRepository.deleteAllByPost(postEntity);
 		postEntityRepository.delete(postEntity);
 	}
 
@@ -100,7 +102,7 @@ public class PostService {
 	}
 
 
-	public int likeCount(Integer postId) {
+	public long likeCount(Integer postId) {
 		PostEntity postEntity = getPostEntityOrException(postId);
 		return likeEntityRepository.countByPost(postEntity);
 	}
