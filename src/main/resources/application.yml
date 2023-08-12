@@ -16,6 +16,9 @@ spring:
     show-sql: true
     database: postgresql
 
+  redis:
+    url: redis://:pe97880a08d0a5a51a58a292e73e19382d5ff8445c80a2da3c3bfd9e956441265@ec2-35-172-27-78.compute-1.amazonaws.com:22669
+
 jwt:
   secret-key: fast-campus.simple_sns_2023_secret_key
   # 30 days

@@ -36,6 +36,7 @@ public class PostService {
 	private final LikeEntityRepository likeEntityRepository;
 	private final CommentEntityRepository commentEntityRepository;
 	private final AlarmEntityRepository alarmEntityRepository;
+	private final AlarmService alarmService;
 
 	public Page<Post> list(Pageable pageable) {
 		return postEntityRepository.findAll(pageable).map(Post::fromEntity);
@@ -96,9 +97,9 @@ public class PostService {
 
 		likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
 
-		alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST,
+		AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST,
 			new AlarmArgs(userEntity.getId(), postId)));
-
+		alarmService.send(alarmEntity.getId(), postEntity.getUser().getId());
 	}
 
 
@@ -114,8 +115,10 @@ public class PostService {
 
 		commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
 
-		alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST,
-			new AlarmArgs(userEntity.getId(), postId)));
+		AlarmEntity alarmEntity = alarmEntityRepository.save(
+			AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST,
+				new AlarmArgs(userEntity.getId(), postId)));
+		alarmService.send(alarmEntity.getId(), postEntity.getUser().getId());
 	}
 
 	public Page<Comment> getComment(Integer postId, Pageable pageable) {

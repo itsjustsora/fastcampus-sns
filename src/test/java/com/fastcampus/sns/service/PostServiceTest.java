@@ -19,10 +19,12 @@ import com.fastcampus.sns.exception.ErrorCode;
 import com.fastcampus.sns.exception.SnsApplicationException;
 import com.fastcampus.sns.fixture.PostEntityFixture;
 import com.fastcampus.sns.fixture.UserEntityFixture;
+import com.fastcampus.sns.model.entity.AlarmEntity;
 import com.fastcampus.sns.model.entity.CommentEntity;
 import com.fastcampus.sns.model.entity.LikeEntity;
 import com.fastcampus.sns.model.entity.PostEntity;
 import com.fastcampus.sns.model.entity.UserEntity;
+import com.fastcampus.sns.repository.AlarmEntityRepository;
 import com.fastcampus.sns.repository.CommentEntityRepository;
 import com.fastcampus.sns.repository.LikeEntityRepository;
 import com.fastcampus.sns.repository.PostEntityRepository;
@@ -45,6 +47,13 @@ class PostServiceTest {
 
 	@MockBean
 	private CommentEntityRepository commentEntityRepository;
+
+	@MockBean
+	private AlarmEntityRepository alarmEntityRepository;
+
+	@MockBean
+	private AlarmService alarmService;
+
 
 	@Test
 	void 포스트작성이_성공한경우() {
@@ -196,6 +205,8 @@ class PostServiceTest {
 		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(userEntity));
 		when(postEntityRepository.findById(any())).thenReturn(Optional.of(postEntity));
 		when(likeEntityRepository.findByUserAndPost(userEntity, postEntity)).thenReturn(Optional.empty());
+		when(alarmEntityRepository.save(any())).thenReturn(mock(AlarmEntity.class));
+		doNothing().when(alarmService).send(any(), eq(postEntity.getUser().getId()));
 
 		Assertions.assertDoesNotThrow(() -> postService.like(postId, username));
 	}
@@ -244,9 +255,13 @@ class PostServiceTest {
 		String username = "username";
 		String comment = "This is comment.";
 
+		PostEntity postEntity = PostEntityFixture.get(username, postId, 1);
+
 		when(userEntityRepository.findByUserName(username)).thenReturn(Optional.of(mock(UserEntity.class)));
-		when(postEntityRepository.findById(any())).thenReturn(Optional.of(mock(PostEntity.class)));
+		when(postEntityRepository.findById(any())).thenReturn(Optional.of(postEntity));
 		when(commentEntityRepository.save(any())).thenReturn(mock(CommentEntity.class));
+		when(alarmEntityRepository.save(any())).thenReturn(mock(AlarmEntity.class));
+		doNothing().when(alarmService).send(any(), eq(postEntity.getUser().getId()));
 
 		Assertions.assertDoesNotThrow(() -> postService.comment(postId, username, comment));
 	}

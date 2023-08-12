@@ -13,6 +13,7 @@ import com.fastcampus.sns.model.Alarm;
 import com.fastcampus.sns.model.User;
 import com.fastcampus.sns.model.entity.UserEntity;
 import com.fastcampus.sns.repository.AlarmEntityRepository;
+import com.fastcampus.sns.repository.UserCacheRepository;
 import com.fastcampus.sns.repository.UserEntityRepository;
 import com.fastcampus.sns.util.JwtTokenUtils;
 
@@ -25,6 +26,7 @@ public class UserService {
 	private final UserEntityRepository userEntityRepository;
 	private final BCryptPasswordEncoder encoder;
 	private final AlarmEntityRepository alarmEntityRepository;
+	private final UserCacheRepository userCacheRepository;
 
 	@Value("${jwt.secret-key}")
 	private String secretKey;
@@ -33,9 +35,10 @@ public class UserService {
 	private Long expiredTimeMs;
 
 	public User loadUserByUsername(String username) {
-		return userEntityRepository.findByUserName(username).map(User::fromEntity).orElseThrow(
-			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username))
-		);
+		return userCacheRepository.getUser(username).orElseGet(() ->
+				userEntityRepository.findByUserName(username).map(User::fromEntity).orElseThrow(
+				() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username))
+		));
 	}
 
 	@Transactional
@@ -54,11 +57,11 @@ public class UserService {
 	// TODO : implement
 	public String login(String username, String password) {
 		// 회원가입 여부 체크
-		UserEntity userEntity = userEntityRepository.findByUserName(username).orElseThrow(
-			() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", username)));
+		User user = loadUserByUsername(username);
+		userCacheRepository.setUser(user);
 
 		// 비밀번호 체크
-		if(!encoder.matches(password, userEntity.getPassword())) {
+		if(!encoder.matches(password, user.getPassword())) {
 			throw new SnsApplicationException(ErrorCode.INVALID_PASSWORD);
 		}
 
