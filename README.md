@@ -12,7 +12,7 @@
 - Lombok
 - Github
 - JUnit5
-- Kafka
+- ~~Kafka~~
 - PostgreSQL
 - Redis
 - Heroku
